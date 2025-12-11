@@ -89,7 +89,11 @@ export class MangaService {
 
     if (error.error instanceof ErrorEvent) {
       // Client-side or network error
-      errorMessage = `Error: ${error.error.message}`;
+      errorMessage = `Network Error: ${error.error.message}`;
+    } else if (error.status === 0) {
+      // CORS error or network failure
+      errorMessage =
+        'Unable to connect to the server. Please check your internet connection or try again later.';
     } else {
       // Backend returned an unsuccessful response code
       const errorResponse = error.error as ErrorResponse;
@@ -97,7 +101,12 @@ export class MangaService {
         errorResponse?.error || `Error ${error.status}: ${error.message}`;
     }
 
-    console.error('MangaService Error:', errorMessage);
+    console.error('MangaService Error:', {
+      status: error.status,
+      message: error.message,
+      url: error.url,
+      error: errorMessage,
+    });
     return throwError(() => new Error(errorMessage));
   }
 }
