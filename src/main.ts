@@ -4,7 +4,7 @@ import { AppModule } from './app/app.module';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
 import { APP_INITIALIZER, isDevMode } from '@angular/core';
-import { inject } from '@vercel/analytics/*';
+import { inject } from '@vercel/analytics';
 
 platformBrowserDynamic()
   .bootstrapModule(AppModule)
