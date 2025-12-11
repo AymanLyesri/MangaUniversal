@@ -1,35 +1,46 @@
-<header class="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-border">
+<header class="sticky top-0 z-50 glass bg-surface/80 border-b border-border/50 animate-slide-down">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       <!-- Logo -->
       <a 
         routerLink="/" 
-        class="flex items-center space-x-3 text-xl font-bold text-text-primary hover:text-primary transition-colors duration-200"
+        class="group flex items-center space-x-3 text-xl font-bold text-text-primary hover:text-primary transition-all duration-300"
       >
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg 
+          class="w-8 h-8 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
         </svg>
-        <span class="hidden sm:inline">MangaUniversal</span>
+        <span class="hidden sm:inline transition-all duration-300 group-hover:tracking-wide">MangaUniversal</span>
       </a>
 
       <!-- Theme Toggle -->
       <button
         (click)="toggleTheme()"
-        class="p-2 rounded-lg hover:bg-surface-hover transition-all duration-200 text-text-secondary hover:text-text-primary"
+        class="relative p-2.5 rounded-xl hover:bg-surface-hover transition-all duration-300 text-text-secondary hover:text-text-primary hover:scale-110 active:scale-95 focus-ring overflow-hidden group"
         [attr.aria-label]="(isDark$ | async) ? 'Switch to light mode' : 'Switch to dark mode'"
       >
+        <!-- Animated background on hover -->
+        <div class="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+        
+        <!-- Moon Icon (Dark Mode) -->
         <svg 
           *ngIf="!(isDark$ | async)" 
-          class="w-6 h-6" 
+          class="w-6 h-6 relative z-10 transition-all duration-300 group-hover:rotate-12" 
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
         >
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
         </svg>
+        
+        <!-- Sun Icon (Light Mode) -->
         <svg 
           *ngIf="isDark$ | async" 
-          class="w-6 h-6" 
+          class="w-6 h-6 relative z-10 transition-all duration-300 group-hover:rotate-90" 
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"

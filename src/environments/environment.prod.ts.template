@@ -1,5 +1,0 @@
-export const environment = {
-  production: true,
-  // For Vercel: This will be replaced by the build script using VITE_API_URL env var
-  apiUrl: process.env['NG_APP_API_URL'] || 'http://localhost:8080/api'
-};
