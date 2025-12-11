@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MangaService } from '../../services/manga.service';
+import { NavbarService } from '../../services/navbar.service';
 import { Chapter } from '../../models/manga.model';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -36,14 +37,20 @@ export class ReaderComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
   private controlsTimeout?: number;
+  private lastScrollY = 0;
+  private scrollThreshold = 50;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private mangaService: MangaService
+    private mangaService: MangaService,
+    private navbarService: NavbarService
   ) {}
 
   ngOnInit(): void {
+    // Hide navbar when entering reader mode
+    this.navbarService.hide();
+
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       this.mangaId = params.get('id') || '';
       this.mangaSlug = params.get('slug') || '';
@@ -59,6 +66,9 @@ export class ReaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Show navbar when exiting reader mode
+    this.navbarService.show();
+
     this.destroy$.next();
     this.destroy$.complete();
     if (this.controlsTimeout) {
@@ -78,6 +88,32 @@ export class ReaderComponent implements OnInit, OnDestroy {
       case 'Escape':
         this.exitReader();
         break;
+      case 'h':
+      case 'H':
+        // Toggle controls visibility with 'H' key
+        this.showControls$.next(!this.showControls$.value);
+        if (this.showControls$.value) {
+          this.resetControlsTimeout();
+        }
+        break;
+    }
+  }
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+    const currentScrollY = window.scrollY || window.pageYOffset;
+
+    // Show controls when scrolling up, hide when scrolling down
+    if (Math.abs(currentScrollY - this.lastScrollY) > this.scrollThreshold) {
+      if (currentScrollY < this.lastScrollY) {
+        // Scrolling up - show controls
+        this.showControls$.next(true);
+        this.resetControlsTimeout();
+      } else {
+        // Scrolling down - hide controls
+        this.showControls$.next(false);
+      }
+      this.lastScrollY = currentScrollY;
     }
   }
 
@@ -85,6 +121,16 @@ export class ReaderComponent implements OnInit, OnDestroy {
   onMouseMove(): void {
     this.showControls$.next(true);
     this.resetControlsTimeout();
+  }
+
+  @HostListener('click')
+  onClick(): void {
+    // Toggle controls on click (mobile friendly)
+    const currentState = this.showControls$.value;
+    this.showControls$.next(!currentState);
+    if (!currentState) {
+      this.resetControlsTimeout();
+    }
   }
 
   private loadPages(chapterId: string): void {
@@ -145,7 +191,7 @@ export class ReaderComponent implements OnInit, OnDestroy {
     }
     this.controlsTimeout = window.setTimeout(() => {
       this.showControls$.next(false);
-    }, 3000);
+    }, 1000);
   }
 
   get currentPageUrl(): string {

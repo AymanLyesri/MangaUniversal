@@ -1,8 +1,8 @@
 <div class="min-h-screen bg-surface theme-transition">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Simple Header -->
-    <div class="text-center space-y-2 mb-8 animate-fade-in-up">
-      <h1 class="text-3xl sm:text-4xl font-bold text-text-primary">
+    <div class="section-header mb-8 animate-fade-in-up">
+      <h1 class="section-title text-3xl sm:text-4xl">
         Search Results
       </h1>
       <p *ngIf="searchQuery" class="text-base text-text-secondary">
@@ -11,14 +11,14 @@
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="loading$ | async" class="flex flex-col items-center justify-center py-20 space-y-4 animate-fade-in">
+    <div *ngIf="loading$ | async" class="state-loading">
       <div class="spinner h-16 w-16"></div>
       <p class="text-text-secondary animate-pulse-soft">Searching for manga...</p>
     </div>
 
     <!-- Error State -->
-    <div *ngIf="(error$ | async) && !(loading$ | async)" class="max-w-md mx-auto animate-scale-in">
-      <div class="glass-card bg-red-500/10 border border-red-500/30 rounded-2xl p-6 text-center shadow-xl">
+    <div *ngIf="(error$ | async) && !(loading$ | async)" class="state-error">
+      <div class="state-error-card">
         <svg class="w-12 h-12 mx-auto text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
@@ -35,7 +35,7 @@
         Found <span class="text-primary font-semibold">{{ resultCount }}</span> result{{ resultCount !== 1 ? 's' : '' }}
       </p>
       
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 fade-in-stagger">
+      <div class="grid-manga fade-in-stagger">
         <app-manga-card
           *ngFor="let manga of searchResults$ | async; trackBy: trackByMangaId"
           [manga]="manga"
@@ -46,7 +46,7 @@
     <!-- No Results -->
     <div 
       *ngIf="!(loading$ | async) && searchQuery && (searchResults$ | async)?.length === 0 && !(error$ | async)"
-      class="text-center py-20 space-y-4 animate-fade-in-up"
+      class="state-empty"
     >
       <svg class="w-16 h-16 mx-auto text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

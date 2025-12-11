@@ -1,30 +1,30 @@
 <a
   [routerLink]="['/manga', manga.id, mangaSlug]"
-  class="group block bg-surface-elevated rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.03] border border-border hover:border-border-hover animate-fade-in-up hover-lift"
+  class="group manga-card animate-fade-in-up"
 >
   <!-- Cover Image -->
-  <div class="relative aspect-[3/4] overflow-hidden bg-surface">
+  <div class="manga-card-cover">
     <img
       [src]="coverImageSrc"
       [alt]="manga.title"
-      class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-75"
+      class="manga-card-img"
       loading="lazy"
       crossorigin="anonymous"
       onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22%3E%3Crect width=%22300%22 height=%22400%22 fill=%22%23333%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2220%22%3ENo Image%3C/text%3E%3C/svg%3E'"
     />
     
     <!-- Glass overlay on hover -->
-    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    <div class="manga-card-overlay"></div>
     
     <!-- Status Badge -->
     <div class="absolute top-3 right-3 z-10">
       <span 
-        class="px-2.5 py-1.5 text-xs font-semibold rounded-lg glass shadow-lg transition-all duration-300 group-hover:scale-110"
+        class="badge-status group-hover:scale-110"
         [ngClass]="{
-          'bg-green-500/90 text-white': manga.status === 'ongoing',
-          'bg-blue-500/90 text-white': manga.status === 'completed',
-          'bg-yellow-500/90 text-white': manga.status === 'hiatus',
-          'bg-red-500/90 text-white': manga.status === 'cancelled'
+          'badge-status-ongoing': manga.status === 'ongoing',
+          'badge-status-completed': manga.status === 'completed',
+          'badge-status-hiatus': manga.status === 'hiatus',
+          'badge-status-cancelled': manga.status === 'cancelled'
         }"
       >
         {{ manga.status }}
@@ -43,9 +43,9 @@
   </div>
 
   <!-- Content -->
-  <div class="p-4 space-y-2 bg-gradient-to-b from-surface-elevated to-surface transition-colors duration-300">
+  <div class="manga-card-content">
     <!-- Title -->
-    <h3 class="font-semibold text-lg text-text-primary line-clamp-2 group-hover:text-primary transition-all duration-300 group-hover:translate-x-1">
+    <h3 class="manga-card-title text-lg">
       {{ manga.title }}
     </h3>
 
@@ -66,7 +66,7 @@
     <div *ngIf="manga.tags && manga.tags.length > 0" class="flex flex-wrap gap-1.5 pt-2">
       <span
         *ngFor="let tag of displayTags"
-        class="px-2.5 py-1 text-xs bg-primary/10 text-primary rounded-lg border border-primary/20 transition-all duration-300 hover:bg-primary/20 hover:scale-105"
+        class="badge-tag"
       >
         {{ tag }}
       </span>

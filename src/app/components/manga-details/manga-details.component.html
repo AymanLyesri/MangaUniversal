@@ -1,13 +1,13 @@
 <div class="min-h-screen bg-surface theme-transition">
   <!-- Loading State -->
-  <div *ngIf="loading$ | async" class="flex flex-col justify-center items-center min-h-screen space-y-4 animate-fade-in">
+  <div *ngIf="loading$ | async" class="state-loading min-h-screen">
     <div class="spinner h-16 w-16"></div>
     <p class="text-text-secondary animate-pulse-soft">Loading manga details...</p>
   </div>
 
   <!-- Error State -->
   <div *ngIf="(error$ | async) && !(loading$ | async)" class="container mx-auto px-4 py-12 animate-scale-in">
-    <div class="max-w-md mx-auto glass-card bg-red-500/10 border border-red-500/30 rounded-2xl p-8 text-center shadow-xl">
+    <div class="state-error-card p-8">
       <svg class="w-16 h-16 mx-auto text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
@@ -23,7 +23,7 @@
     <!-- Back Button -->
     <button
       routerLink="/"
-      class="group inline-flex items-center gap-2 text-text-secondary hover:text-primary transition-all duration-300 mb-8 hover:gap-3 focus-ring rounded-lg px-4 py-2 hover:bg-surface-elevated"
+      class="group btn-ghost mb-8 hover:gap-3"
     >
       <svg class="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -36,7 +36,7 @@
       <div class="lg:col-span-1">
         <div class="sticky top-20 space-y-6">
           <!-- Cover Image -->
-          <div class="group relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl bg-surface-elevated border border-border hover:shadow-primary/20 transition-all duration-500 hover:scale-[1.02]">
+          <div class="group card card-hover relative aspect-[3/4] overflow-hidden shadow-2xl bg-surface-elevated">
             <img
               [src]="coverImageSrc(manga.cover)"
               [alt]="manga.title"
@@ -49,13 +49,18 @@
           </div>
 
           <!-- Quick Info Card -->
-          <div class="glass-card rounded-2xl p-6 space-y-5 border border-border shadow-xl animate-fade-in-up" style="animation-delay: 100ms;">
+          <div class="card-glass card-content space-y-5 shadow-xl animate-fade-in-up" style="animation-delay: 100ms;">
             <!-- Status -->
             <div class="flex items-center justify-between group">
               <span class="text-text-secondary font-medium">Status</span>
               <span 
-                class="px-4 py-1.5 text-sm font-semibold rounded-full text-white capitalize shadow-lg transition-transform duration-300 group-hover:scale-105"
-                [ngClass]="getStatusColor(manga.status)"
+                class="badge-status capitalize group-hover:scale-105"
+                [ngClass]="{
+                  'badge-status-ongoing': manga.status === 'ongoing',
+                  'badge-status-completed': manga.status === 'completed',
+                  'badge-status-hiatus': manga.status === 'hiatus',
+                  'badge-status-cancelled': manga.status === 'cancelled'
+                }"
               >
                 {{ manga.status }}
               </span>
@@ -74,7 +79,7 @@
               <span class="text-text-primary font-bold text-lg">{{ manga.year }}</span>
             </div>
 
-            <hr class="border-border/50" />
+            <div class="divider"></div>
 
             <!-- Authors -->
             <div *ngIf="manga.authors && manga.authors.length > 0" class="space-y-3">
@@ -85,13 +90,13 @@
                 Authors
               </span>
               <div class="flex flex-wrap gap-2">
-                <span *ngFor="let author of manga.authors" class="px-3 py-1.5 text-sm bg-surface-hover text-text-primary rounded-lg border border-border font-medium transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:border-primary/20 hover:scale-105">
+                <span *ngFor="let author of manga.authors" class="badge-secondary">
                   {{ author }}
                 </span>
               </div>
             </div>
 
-            <hr *ngIf="manga.artists && manga.artists.length > 0" class="border-border/50" />
+            <div *ngIf="manga.artists && manga.artists.length > 0" class="divider"></div>
 
             <!-- Artists -->
             <div *ngIf="manga.artists && manga.artists.length > 0" class="space-y-3">
@@ -102,7 +107,7 @@
                 Artists
               </span>
               <div class="flex flex-wrap gap-2">
-                <span *ngFor="let artist of manga.artists" class="px-3 py-1.5 text-sm bg-surface-hover text-text-primary rounded-lg border border-border font-medium transition-all duration-300 hover:bg-primary/10 hover:text-primary hover:border-primary/20 hover:scale-105">
+                <span *ngFor="let artist of manga.artists" class="badge-secondary">
                   {{ artist }}
                 </span>
               </div>
@@ -119,7 +124,7 @@
             {{ manga.title }}
           </h1>
 
-          <div class="glass-card rounded-2xl p-6 border border-border">
+            <div class="card-glass card-content">
             <h2 class="text-text-primary font-semibold text-lg mb-3 flex items-center gap-2">
               <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -144,7 +149,7 @@
             <div class="flex flex-wrap gap-2">
               <span
                 *ngFor="let tag of manga.tags"
-                class="px-4 py-2 text-sm font-medium bg-primary/10 text-primary rounded-xl border border-primary/20 transition-all duration-300 hover:bg-primary/20 hover:scale-105 hover:shadow-lg cursor-default"
+                class="badge-tag px-4 py-2 cursor-default"
               >
                 {{ tag }}
               </span>
@@ -153,7 +158,7 @@
         </div>
 
         <!-- Divider -->
-        <hr class="border-border/50" />
+        <div class="divider"></div>
 
         <!-- Chapter List -->
         <app-chapter-list

@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ThemeService } from '../../services/theme.service';
 import { MangaService } from '../../services/manga.service';
+import { NavbarService } from '../../services/navbar.service';
 import { MangaSearchResult } from '../../models/manga.model';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import {
@@ -27,6 +28,7 @@ import { generateSlug } from '../../utils/helpers';
 })
 export class HeaderComponent implements OnDestroy {
   isDark$: Observable<boolean>;
+  isNavbarVisible$: Observable<boolean>;
   searchQuery = '';
   searchResults$ = new BehaviorSubject<MangaSearchResult[]>([]);
   showSearchResults$ = new BehaviorSubject<boolean>(false);
@@ -38,11 +40,13 @@ export class HeaderComponent implements OnDestroy {
   constructor(
     private themeService: ThemeService,
     private mangaService: MangaService,
+    private navbarService: NavbarService,
     private router: Router
   ) {
     this.isDark$ = this.themeService.theme$.pipe(
       map((theme) => this.themeService.getEffectiveTheme(theme) === 'dark')
     );
+    this.isNavbarVisible$ = this.navbarService.getVisibility();
     this.setupSearch();
   }
 

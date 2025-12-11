@@ -224,44 +224,359 @@
   }
 }
 
-/* Component-specific styles */
+/* ====================================
+   UNIFIED DESIGN SYSTEM COMPONENTS
+   ==================================== */
+
 @layer components {
-  /* Enhanced button styles */
+  /* =====================================
+     BUTTON SYSTEM - Unified Button Styles
+     ===================================== */
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2;
+    @apply px-6 py-3 rounded-xl font-semibold;
+    @apply transition-all duration-300 ease-out;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface;
+    @apply active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
   .btn-primary {
-    @apply px-6 py-3 bg-primary text-white rounded-lg;
-    @apply transition-all duration-300;
-    @apply hover:scale-105 hover:shadow-lg hover:bg-primary-hover;
-    @apply active:scale-95;
-    @apply focus-ring;
+    @apply btn bg-primary text-white;
+    @apply hover:bg-primary-hover hover:scale-105 hover:shadow-lg;
+    @apply focus:ring-primary;
   }
 
   .btn-secondary {
-    @apply px-6 py-3 bg-surface-elevated border border-border rounded-lg;
-    @apply text-text-primary;
-    @apply transition-all duration-300;
+    @apply btn bg-surface-elevated border border-border text-text-primary;
     @apply hover:bg-surface-hover hover:border-border-hover hover:scale-105;
-    @apply active:scale-95;
-    @apply focus-ring;
+    @apply focus:ring-primary;
   }
 
-  /* Enhanced input styles */
-  .input-primary {
-    @apply w-full px-4 py-3 bg-surface-elevated border border-border rounded-lg;
+  .btn-ghost {
+    @apply btn bg-transparent text-text-secondary;
+    @apply hover:bg-surface-hover hover:text-text-primary;
+    @apply focus:ring-primary;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-500 text-white;
+    @apply hover:bg-red-600 hover:scale-105 hover:shadow-lg;
+    @apply focus:ring-red-500;
+  }
+
+  .btn-sm {
+    @apply px-4 py-2 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-8 py-4 text-lg;
+  }
+
+  .btn-icon {
+    @apply p-2.5 rounded-xl;
+    @apply transition-all duration-300;
+    @apply hover:bg-surface-hover hover:scale-110 active:scale-95;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface;
+  }
+
+  /* =====================================
+     CARD SYSTEM - Unified Card Styles
+     ===================================== */
+
+  .card {
+    @apply bg-surface-elevated border border-border rounded-2xl;
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .card-glass {
+    @apply card glass backdrop-blur-xl;
+    @apply bg-surface-elevated/80 border-border/50;
+  }
+
+  .card-hover {
+    @apply hover:shadow-2xl hover:border-border-hover hover:scale-[1.02];
+    @apply hover:-translate-y-1;
+  }
+
+  .card-interactive {
+    @apply card card-hover cursor-pointer;
+  }
+
+  .card-content {
+    @apply p-6;
+  }
+
+  .card-header {
+    @apply p-6 border-b border-border;
+  }
+
+  .card-footer {
+    @apply p-6 border-t border-border;
+  }
+
+  /* =====================================
+     MANGA CARD - Specialized Card for Manga Display
+     ===================================== */
+
+  .manga-card {
+    @apply block bg-surface-elevated rounded-xl overflow-hidden;
+    @apply border border-border transition-all duration-300;
+    @apply hover:shadow-2xl hover:scale-[1.03] hover:border-border-hover;
+    @apply hover:-translate-y-1;
+  }
+
+  .manga-card-cover {
+    @apply relative aspect-[3/4] overflow-hidden bg-surface;
+  }
+
+  .manga-card-img {
+    @apply w-full h-full object-cover;
+    @apply transition-all duration-500;
+  }
+
+  .manga-card:hover .manga-card-img {
+    @apply scale-110 brightness-75;
+  }
+
+  .manga-card-overlay {
+    @apply absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent;
+    @apply opacity-0 transition-opacity duration-300;
+  }
+
+  .manga-card:hover .manga-card-overlay {
+    @apply opacity-100;
+  }
+
+  .manga-card-content {
+    @apply p-4 space-y-2;
+    @apply bg-gradient-to-b from-surface-elevated to-surface;
+    @apply transition-colors duration-300;
+  }
+
+  .manga-card-title {
+    @apply font-semibold text-base text-text-primary line-clamp-2;
+    @apply transition-all duration-300;
+  }
+
+  .manga-card:hover .manga-card-title {
+    @apply text-primary translate-x-1;
+  }
+
+  /* =====================================
+     SECTION SYSTEM - Page Layout Sections
+     ===================================== */
+
+  .section {
+    @apply py-8 px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-container {
+    @apply container mx-auto max-w-8xl;
+  }
+
+  .section-header {
+    @apply text-center space-y-3 mb-10;
+  }
+
+  .section-title {
+    @apply text-3xl sm:text-4xl lg:text-5xl font-bold text-text-primary;
+    @apply leading-tight;
+  }
+
+  .section-subtitle {
+    @apply text-base sm:text-lg text-text-secondary max-w-2xl mx-auto;
+  }
+
+  /* =====================================
+     BADGE SYSTEM - Status & Info Badges
+     ===================================== */
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5;
+    @apply text-xs font-semibold rounded-lg;
+    @apply transition-all duration-300;
+  }
+
+  .badge-primary {
+    @apply badge bg-primary/90 text-white;
+    @apply hover:scale-105 hover:shadow-lg;
+  }
+
+  .badge-status {
+    @apply badge shadow-lg;
+  }
+
+  .badge-status-ongoing {
+    @apply badge-status bg-green-500/90 text-white;
+  }
+
+  .badge-status-completed {
+    @apply badge-status bg-blue-500/90 text-white;
+  }
+
+  .badge-status-hiatus {
+    @apply badge-status bg-yellow-500/90 text-white;
+  }
+
+  .badge-status-cancelled {
+    @apply badge-status bg-red-500/90 text-white;
+  }
+
+  .badge-secondary {
+    @apply badge bg-surface-hover text-text-primary border border-border;
+    @apply hover:bg-primary/10 hover:text-primary hover:border-primary/20 hover:scale-105;
+  }
+
+  .badge-tag {
+    @apply badge bg-primary/10 text-primary border border-primary/20;
+    @apply hover:bg-primary/20 hover:scale-105 hover:shadow-lg;
+  }
+
+  .badge-glass {
+    @apply badge glass bg-white/10 backdrop-blur-md border border-white/20 text-white;
+  }
+
+  /* =====================================
+     INPUT SYSTEM - Form Inputs
+     ===================================== */
+
+  .input {
+    @apply w-full px-4 py-3 rounded-lg;
+    @apply bg-surface-elevated border border-border;
     @apply text-text-primary placeholder-text-tertiary;
     @apply transition-all duration-300;
     @apply focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
     @apply hover:border-border-hover;
   }
 
-  /* Card with glass effect */
-  .card-glass {
-    @apply glass-card rounded-xl p-6;
-    @apply transition-all duration-300 ease-out;
-    @apply hover:shadow-xl hover:scale-[1.02];
+  .input-sm {
+    @apply px-3 py-2 text-sm;
   }
 
-  /* Loading spinner */
+  .input-search {
+    @apply input text-sm glass bg-surface-elevated/50;
+  }
+
+  /* =====================================
+     STATE SYSTEM - Loading, Error, Empty States
+     ===================================== */
+
+  .state-container {
+    @apply flex flex-col items-center justify-center py-20 space-y-4;
+  }
+
+  .state-loading {
+    @apply state-container animate-fade-in;
+  }
+
+  .state-error {
+    @apply max-w-md mx-auto animate-scale-in;
+  }
+
+  .state-error-card {
+    @apply card-glass bg-red-500/10 border-red-500/30 rounded-2xl;
+    @apply p-6 text-center shadow-xl;
+  }
+
+  .state-empty {
+    @apply state-container animate-fade-in-up;
+  }
+
+  /* =====================================
+     SPINNER - Loading Animation
+     ===================================== */
+
   .spinner {
-    @apply animate-spin rounded-full border-4 border-primary border-t-transparent;
+    @apply animate-spin rounded-full;
+    @apply border-4 border-primary border-t-transparent;
+  }
+
+  .spinner-light {
+    @apply spinner border-white/20 border-t-white;
+  }
+
+  /* =====================================
+     GRID SYSTEM - Content Grids
+     ===================================== */
+
+  .grid-manga {
+    @apply grid gap-4 sm:gap-6;
+    @apply grid-cols-2 sm:grid-cols-3 md:grid-cols-4;
+    @apply lg:grid-cols-5 xl:grid-cols-6;
+  }
+
+  .grid-pages {
+    @apply grid gap-2;
+    @apply grid-cols-5 sm:grid-cols-8 md:grid-cols-10;
+    @apply lg:grid-cols-12 xl:grid-cols-14;
+  }
+
+  /* =====================================
+     ICON WRAPPER - Consistent Icon Sizing
+     ===================================== */
+
+  .icon {
+    @apply w-5 h-5;
+  }
+
+  .icon-sm {
+    @apply w-4 h-4;
+  }
+
+  .icon-lg {
+    @apply w-6 h-6;
+  }
+
+  .icon-xl {
+    @apply w-8 h-8;
+  }
+
+  /* =====================================
+     DIVIDER - Section Separators
+     ===================================== */
+
+  .divider {
+    @apply border-t border-border/50;
+  }
+
+  /* =====================================
+     READER SPECIFIC - Special Components for Reader
+     ===================================== */
+
+  .reader-control-bar {
+    @apply fixed left-0 right-0 z-50;
+    @apply backdrop-filter backdrop-blur-xl;
+    @apply transition-all duration-500 ease-out;
+  }
+
+  .reader-control-bar-top {
+    @apply reader-control-bar top-0;
+    @apply bg-gradient-to-b from-black/90 to-transparent;
+  }
+
+  .reader-control-bar-bottom {
+    @apply reader-control-bar bottom-0;
+    @apply bg-gradient-to-t from-black/90 to-transparent;
+  }
+
+  .reader-control-btn {
+    @apply flex items-center gap-2.5 px-4 py-2.5 rounded-xl;
+    @apply bg-white/10 text-white border-none font-medium;
+    @apply transition-all duration-300 cursor-pointer;
+    @apply hover:bg-white/20;
+  }
+
+  .reader-nav-btn {
+    @apply p-4 rounded-xl;
+    @apply bg-white/10 backdrop-blur-md border border-white/20 text-white;
+    @apply transition-all duration-300 cursor-pointer;
+    @apply hover:bg-white/20 hover:scale-110 active:scale-95;
+    @apply disabled:opacity-30 disabled:cursor-not-allowed;
+  }
+
+  .reader-page-badge {
+    @apply px-6 py-2.5 rounded-xl font-bold text-white;
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
   }
 }

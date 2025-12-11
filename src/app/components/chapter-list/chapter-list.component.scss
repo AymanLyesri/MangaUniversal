@@ -1,21 +1,24 @@
+// Chapter list uses unified design system classes
+// Custom scrollbar for chapter list
+
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
-}
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-}
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.3);
-  border-radius: 4px;
-}
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.3);
+    border-radius: 4px;
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(156, 163, 175, 0.5);
+    &:hover {
+      background-color: rgba(156, 163, 175, 0.5);
+    }
+  }
 }

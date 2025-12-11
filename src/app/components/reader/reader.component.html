@@ -1,162 +1,145 @@
-<div class="fixed inset-0 bg-black">
+<!-- Reader Container: Full screen, black background for optimal reading -->
+<div class="reader-container">
   <!-- Loading State -->
-  <div *ngIf="loading$ | async" class="flex flex-col justify-center items-center h-full space-y-6 animate-fade-in">
-    <div class="spinner h-16 w-16 border-white border-t-transparent"></div>
-    <p class="text-white text-lg font-medium animate-pulse-soft">Loading page...</p>
+  <div *ngIf="loading$ | async" class="reader-state">
+    <div class="spinner spinner-light h-16 w-16"></div>
+    <p class="loading-text">Loading page...</p>
   </div>
 
   <!-- Error State -->
-  <div *ngIf="(error$ | async) && !(loading$ | async)" class="flex justify-center items-center h-full animate-scale-in">
-    <div class="text-center space-y-6 p-8 glass bg-white/10 rounded-3xl border border-white/20 max-w-md">
-      <svg class="w-20 h-20 mx-auto text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <div *ngIf="(error$ | async) && !(loading$ | async)" class="reader-state">
+    <div class="error-card">
+      <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
-      <p class="text-red-400 text-xl font-semibold">{{ error$ | async }}</p>
-      <button
-        (click)="exitReader()"
-        class="px-8 py-3 bg-white text-black rounded-xl hover:bg-gray-200 transition-all duration-300 font-bold hover:scale-105 shadow-lg"
-      >
-        Go Back
-      </button>
+      <p class="error-message">{{ error$ | async }}</p>
+      <button (click)="exitReader()" class="btn-primary">Go Back</button>
     </div>
   </div>
 
   <!-- Reader Content -->
-  <div *ngIf="!(loading$ | async) && !(error$ | async)" class="h-full flex flex-col">
-    <!-- Top Controls -->
-    <div 
-      class="absolute top-0 left-0 right-0 z-50 glass bg-gradient-to-b from-black/90 to-transparent transition-all duration-500 backdrop-blur-md"
-      [class.opacity-0]="!(showControls$ | async)"
-      [class.pointer-events-none]="!(showControls$ | async)"
-      [class.-translate-y-full]="!(showControls$ | async)"
-    >
-      <div class="container mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
+  <div *ngIf="!(loading$ | async) && !(error$ | async)" class="reader-content">
+    
+    <!-- Top Control Bar -->
+    <div class="control-bar control-bar-top" 
+         [class.control-hidden]="!(showControls$ | async)">
+      <div class="control-bar-content">
         <!-- Exit Button -->
-        <button
-          (click)="exitReader()"
-          class="group flex items-center gap-2.5 text-white hover:text-red-400 transition-all duration-300 px-4 py-2.5 rounded-xl hover:bg-white/10 font-medium"
-        >
-          <svg class="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button (click)="exitReader()" class="control-button exit-button" aria-label="Exit reader">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
-          <span class="hidden sm:inline">Exit</span>
+          <span class="button-text">Exit</span>
         </button>
 
         <!-- Chapter Info -->
-        <div class="text-white text-center glass bg-white/10 px-6 py-2.5 rounded-xl border border-white/20">
-          <p class="text-sm sm:text-base font-bold">
-            Reading
-          </p>
+        <div class="info-badge">
+          <span class="info-text">Reading</span>
         </div>
 
         <!-- Page Counter -->
-        <div class="text-white text-sm sm:text-base font-bold glass bg-white/10 px-4 py-2.5 rounded-xl border border-white/20">
-          {{ currentPage }} / {{ totalPages }}
+        <div class="info-badge page-counter">
+          <span class="current-page">{{ currentPage }}</span>
+          <span class="separator">/</span>
+          <span class="total-pages">{{ totalPages }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Main Image Container -->
-    <div class="flex-1 flex items-center justify-center overflow-hidden p-4">
+    <!-- Main Image Area - Fully Centered -->
+    <div class="image-container">
       <img
         [src]="currentPageUrl"
         [alt]="'Page ' + currentPage"
-        class="max-w-full max-h-full w-auto h-auto object-contain shadow-2xl transition-opacity duration-300 animate-fade-in"
+        class="manga-page"
         crossorigin="anonymous"
         (load)="loading$.next(false)"
         (error)="error$.next('Failed to load page')"
       />
     </div>
 
-    <!-- Navigation Zones (Click areas) -->
-    <div class="absolute inset-0 flex pointer-events-none">
-      <!-- Previous Page (Left third) -->
+    <!-- Side Navigation Zones -->
+    <div class="nav-zones">
+      <!-- Left Navigation Zone -->
       <button
         *ngIf="hasPreviousPage"
-        (click)="previousPage()"
-        class="flex-1 pointer-events-auto cursor-w-resize hover:bg-gradient-to-r hover:from-white/10 hover:to-transparent transition-all duration-300 group"
-        aria-label="Previous page"
-      >
-        <div class="h-full flex items-center justify-start pl-8 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-4 group-hover:translate-x-0">
-          <div class="glass bg-white/10 backdrop-blur-md p-4 rounded-full border border-white/20">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
-            </svg>
-          </div>
+        (click)="previousPage(); $event.stopPropagation()"
+        class="nav-zone nav-zone-left"
+        aria-label="Previous page">
+        <div class="nav-indicator">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" />
+          </svg>
         </div>
       </button>
 
-      <!-- Middle (Show controls) -->
-      <div class="flex-1"></div>
+      <!-- Center Zone - Click to toggle controls -->
+      <div class="nav-zone nav-zone-center"></div>
 
-      <!-- Next Page (Right third) -->
+      <!-- Right Navigation Zone -->
       <button
         *ngIf="hasNextPage"
-        (click)="nextPage()"
-        class="flex-1 pointer-events-auto cursor-e-resize hover:bg-gradient-to-l hover:from-white/10 hover:to-transparent transition-all duration-300 group"
-        aria-label="Next page"
-      >
-        <div class="h-full flex items-center justify-end pr-8 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
-          <div class="glass bg-white/10 backdrop-blur-md p-4 rounded-full border border-white/20">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
+        (click)="nextPage(); $event.stopPropagation()"
+        class="nav-zone nav-zone-right"
+        aria-label="Next page">
+        <div class="nav-indicator">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+          </svg>
         </div>
       </button>
     </div>
 
-    <!-- Bottom Controls -->
-    <div 
-      class="absolute bottom-0 left-0 right-0 z-50 glass bg-gradient-to-t from-black/90 to-transparent transition-all duration-500 backdrop-blur-md"
-      [class.opacity-0]="!(showControls$ | async)"
-      [class.pointer-events-none]="!(showControls$ | async)"
-      [class.translate-y-full]="!(showControls$ | async)"
-    >
-      <div class="container mx-auto px-4 sm:px-6 py-6">
-        <!-- Navigation Buttons -->
-        <div class="flex items-center justify-center gap-4 sm:gap-6">
+    <!-- Bottom Control Bar -->
+    <div class="control-bar control-bar-bottom"
+         [class.control-hidden]="!(showControls$ | async)">
+      <div class="control-bar-content">
+        <!-- Navigation Controls -->
+        <div class="navigation-controls">
           <button
-            (click)="previousPage()"
+            (click)="previousPage(); $event.stopPropagation()"
             [disabled]="!hasPreviousPage"
-            class="group p-4 rounded-xl glass bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 text-white border border-white/20 hover:scale-110 active:scale-95 hover:shadow-lg"
-            aria-label="Previous page"
-          >
-            <svg class="w-6 h-6 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="nav-button"
+            aria-label="Previous page">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
 
           <!-- Page Input -->
-          <div class="flex items-center gap-3 text-white glass bg-white/10 px-5 py-3 rounded-xl border border-white/20">
+          <div class="page-input-container">
             <input
               type="number"
               [value]="currentPage"
-              (change)="goToPage(+$any($event.target).value)"
+              (change)="goToPage(+$any($event.target).value); $event.stopPropagation()"
+              (click)="$event.stopPropagation()"
               min="1"
               [max]="totalPages"
-              class="w-16 sm:w-20 px-3 py-2 text-center bg-black/30 border border-white/20 rounded-lg text-white font-bold focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-300"
+              class="page-input"
+              aria-label="Current page"
             />
-            <span class="font-bold text-lg">/ {{ totalPages }}</span>
+            <span class="page-separator">/</span>
+            <span class="page-total">{{ totalPages }}</span>
           </div>
 
           <button
-            (click)="nextPage()"
+            (click)="nextPage(); $event.stopPropagation()"
             [disabled]="!hasNextPage"
-            class="group p-4 rounded-xl glass bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300 text-white border border-white/20 hover:scale-110 active:scale-95 hover:shadow-lg"
-            aria-label="Next page"
-          >
-            <svg class="w-6 h-6 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="nav-button"
+            aria-label="Next page">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
             </svg>
           </button>
         </div>
 
-        <!-- Keyboard Hints -->
-        <div class="mt-5 text-center text-sm text-white/70 font-medium flex items-center justify-center gap-2 flex-wrap">
-          <span class="glass bg-white/10 px-3 py-1.5 rounded-lg border border-white/20">← → Arrow keys</span>
-          <span class="text-white/50">•</span>
-          <span class="glass bg-white/10 px-3 py-1.5 rounded-lg border border-white/20">ESC to exit</span>
+        <!-- Keyboard Shortcuts -->
+        <div class="shortcuts">
+          <span class="shortcut-badge">← → Navigate</span>
+          <span class="shortcut-separator">•</span>
+          <span class="shortcut-badge">H Toggle UI</span>
+          <span class="shortcut-separator">•</span>
+          <span class="shortcut-badge">ESC Exit</span>
         </div>
       </div>
     </div>

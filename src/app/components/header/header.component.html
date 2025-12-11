@@ -1,4 +1,7 @@
-<header class="sticky top-0 z-50 glass bg-surface/80 border-b border-border/50 animate-slide-down">
+<header 
+  class="sticky top-0 z-50 glass bg-surface/80 border-b border-border/50 transition-transform duration-500 ease-in-out"
+  [class.animate-slide-down]="isNavbarVisible$ | async"
+  [class.-translate-y-full]="!(isNavbarVisible$ | async)">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between gap-4 h-16">
       <!-- Logo -->
@@ -32,7 +35,7 @@
           (blur)="hideResults()"
           (keydown.enter)="navigateToSearch()"
           placeholder="Search manga..."
-          class="w-full pl-10 pr-10 py-2 text-sm glass bg-surface-elevated/50 border border-border rounded-lg text-text-primary placeholder-text-tertiary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary hover:border-border-hover"
+          class="input-search w-full pl-10 pr-10 py-2"
         />
         <button
           *ngIf="searchQuery"
@@ -47,7 +50,7 @@
         <!-- Search Results Dropdown -->
         <div 
           *ngIf="showSearchResults$ | async"
-          class="absolute top-full mt-2 w-full glass bg-surface-elevated border border-border rounded-lg shadow-2xl overflow-hidden z-50 animate-scale-in max-h-96 overflow-y-auto"
+          class="absolute top-full mt-2 w-full card-glass shadow-2xl overflow-hidden z-50 animate-scale-in max-h-96 overflow-y-auto"
         >
           <!-- Loading -->
           <div *ngIf="isSearching$ | async" class="p-4 text-center text-text-secondary text-sm">
@@ -91,7 +94,7 @@
       <!-- Theme Toggle -->
       <button
         (click)="toggleTheme()"
-        class="relative p-2.5 rounded-xl hover:bg-surface-hover transition-all duration-300 text-text-secondary hover:text-text-primary hover:scale-110 active:scale-95 focus-ring overflow-hidden group flex-shrink-0"
+        class="btn-icon relative overflow-hidden group flex-shrink-0"
         [attr.aria-label]="(isDark$ | async) ? 'Switch to light mode' : 'Switch to dark mode'"
       >
         <!-- Animated background on hover -->

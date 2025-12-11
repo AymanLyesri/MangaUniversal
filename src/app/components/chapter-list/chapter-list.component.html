@@ -6,13 +6,13 @@
       </svg>
       Chapters
     </h2>
-    <span class="px-4 py-2 bg-primary/10 text-primary rounded-xl font-bold border border-primary/20">
+    <span class="badge-primary px-4 py-2">
       {{ chapters.length }}
     </span>
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="chapters.length === 0" class="glass-card rounded-2xl p-12 text-center animate-fade-in">
+  <div *ngIf="chapters.length === 0" class="card-glass card-content p-12 text-center animate-fade-in">
     <svg class="w-16 h-16 mx-auto text-text-tertiary mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
     </svg>
@@ -22,7 +22,7 @@
   <!-- Chapters List -->
   <div class="space-y-3 max-h-[700px] overflow-y-auto pr-2 custom-scrollbar">
     <div *ngFor="let chapter of chapters; trackBy: trackByChapterId"
-      class="glass-card border border-border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-border-hover animate-fade-in-up">
+      class="card-glass card-hover overflow-hidden animate-fade-in-up">
       <!-- Chapter Header (Clickable) -->
       <button (click)="toggleChapter(chapter.id, $event)"
         class="w-full p-5 hover:bg-surface-hover transition-all duration-300 group flex items-start justify-between gap-4">
@@ -42,13 +42,13 @@
 
           <!-- Metadata -->
           <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-text-tertiary">
-            <span *ngIf="chapter.volume" class="flex items-center gap-1.5 bg-surface-hover px-2 py-1 rounded-lg">
+            <span *ngIf="chapter.volume" class="badge-secondary flex items-center gap-1.5 text-xs px-2 py-1">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
               Volume {{ chapter.volume }}
             </span>
-            <span class="flex items-center gap-1.5 bg-surface-hover px-2 py-1 rounded-lg font-medium">
+            <span class="badge-secondary flex items-center gap-1.5 text-xs px-2 py-1 font-medium">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
@@ -97,7 +97,7 @@
           <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 xl:grid-cols-14 gap-2">
             <a *ngFor="let page of getPageNumbers(getActualPageCount(chapter.id))"
               [routerLink]="['/manga', mangaId, mangaSlug, 'read', chapter.id, page]"
-              class="aspect-square flex items-center justify-center bg-surface-elevated hover:bg-primary hover:text-white border border-border hover:border-primary rounded-lg text-sm font-bold text-text-primary transition-all duration-300 hover:scale-110 hover:shadow-lg group">
+              class="btn-secondary aspect-square p-0 text-sm font-bold group hover:bg-primary hover:text-white hover:border-primary hover:scale-110 hover:shadow-lg">
               <span class="transition-transform duration-300 group-hover:scale-110">{{ page }}</span>
             </a>
           </div>
