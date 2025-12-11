@@ -5,7 +5,6 @@ Base URL: `http://localhost:8080`
 ## Table of Contents
 
 - [Manga Endpoints](#manga-endpoints)
-- [Chapter Endpoints](#chapter-endpoints)
 - [Response Models](#response-models)
 - [Error Handling](#error-handling)
 
@@ -164,33 +163,54 @@ fetch(`http://localhost:8080/api/manga/${mangaId}/chapters`)
 
 ---
 
-## Chapter Endpoints
-
-### 1. Get Chapter Pages
+### 4. Get Chapter Pages
 
 Get the page URLs for a specific chapter.
 
-**Endpoint:** `GET /api/chapter/{id}/pages`
+**Endpoint:** `GET /api/manga/chapter/{chapterId}/pages`
 
 **Path Parameters:**
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| id | string | Yes | The MangaDex chapter ID |
+| chapterId | string | Yes | The MangaDex chapter ID |
 
 **Example Request:**
 
 ```javascript
 const chapterId = "e199f8e6-4eb4-4553-9b9e-0e3f2d7e7c5d";
-fetch(`http://localhost:8080/api/chapter/${chapterId}/pages`)
+fetch(`http://localhost:8080/api/manga/chapter/${chapterId}/pages`)
   .then((response) => response.json())
   .then((data) => console.log(data));
 ```
 
-**Success Response (200 OK):**
+**Query Parameters:**
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| useProxy | boolean | true | If true, returns proxy URLs; if false, returns direct MangaDex URLs |
+
+**Success Response (200 OK) - With Proxy (Recommended):**
 
 ```json
 {
-  "pages": ["https://uploads.mangadex.org/data/abc123/x1-page1.jpg", "https://uploads.mangadex.org/data/abc123/x2-page2.jpg", "https://uploads.mangadex.org/data/abc123/x3-page3.jpg"]
+  "pages": [
+    "http://localhost:8080/proxy/mangadex/e199f8e6-4eb4-4553-9b9e-0e3f2d7e7c5d/x1-abc123.jpg",
+    "http://localhost:8080/proxy/mangadex/e199f8e6-4eb4-4553-9b9e-0e3f2d7e7c5d/x2-def456.jpg",
+    "http://localhost:8080/proxy/mangadex/e199f8e6-4eb4-4553-9b9e-0e3f2d7e7c5d/x3-ghi789.jpg"
+  ],
+  "useProxy": true
+}
+```
+
+**Success Response (200 OK) - Direct URLs:**
+
+```json
+{
+  "pages": [
+    "https://uploads.mangadex.org/data/abc123/x1-page1.jpg",
+    "https://uploads.mangadex.org/data/abc123/x2-page2.jpg",
+    "https://uploads.mangadex.org/data/abc123/x3-page3.jpg"
+  ],
+  "useProxy": false
 }
 ```
 
@@ -202,6 +222,77 @@ fetch(`http://localhost:8080/api/chapter/${chapterId}/pages`)
   "status": 400
 }
 ```
+
+---
+
+### 5. Proxy Manga Page Image
+
+**🔥 NEW:** Proxy endpoint to fetch manga page images server-side, bypassing MangaDex anti-hotlinking. This prevents the "Read on MangaDex" placeholder from appearing.
+
+**Endpoint:** `GET /proxy/mangadex/{chapterId}/{filename}`
+
+**Path Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| chapterId | string | Yes | The MangaDex chapter ID |
+| filename | string | Yes | The image filename (e.g., "x1-abc123.jpg") |
+
+**Query Parameters:**
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| dataSaver | boolean | false | If true, fetches compressed images for lower bandwidth |
+
+**Example Request:**
+
+```javascript
+const chapterId = "e199f8e6-4eb4-4553-9b9e-0e3f2d7e7c5d";
+const filename = "x1-abc123.jpg";
+
+// Display in an <img> tag
+<img src={`http://localhost:8080/proxy/mangadex/${chapterId}/${filename}`} alt="Page" />
+
+// Or fetch directly
+fetch(`http://localhost:8080/proxy/mangadex/${chapterId}/${filename}`)
+  .then(response => response.blob())
+  .then(blob => {
+    const imageUrl = URL.createObjectURL(blob);
+    document.getElementById('manga-page').src = imageUrl;
+  });
+```
+
+**Success Response (200 OK):**
+
+Returns the actual image bytes with appropriate headers:
+- `Content-Type: image/jpeg`, `image/png`, or `image/webp`
+- `Cache-Control: public, max-age=86400` (24 hours browser cache)
+- `Content-Length: <size>`
+
+**Error Response (404 Not Found):**
+
+```json
+{
+  "error": "Filename not found in chapter data",
+  "status": 404
+}
+```
+
+**Error Response (502 Bad Gateway):**
+
+```json
+{
+  "error": "Failed to connect to MangaDex servers",
+  "status": 502
+}
+```
+
+**Features:**
+- ✅ Server-side image fetching with proper headers (`Referer`, `User-Agent`)
+- ✅ Bypasses MangaDex anti-hotlinking protection
+- ✅ At-Home server data cached for 3 minutes
+- ✅ Image bytes streamed directly (not cached)
+- ✅ Browser-side caching enabled (24 hours)
+- ✅ Automatic content-type detection
+- ✅ Support for data-saver mode (compressed images)
 
 ---
 
@@ -284,7 +375,9 @@ const BASE_URL = "http://localhost:8080/api";
 export const mangaApi = {
   // Search manga
   searchManga: async (query: string) => {
-    const response = await fetch(`${BASE_URL}/manga/search?q=${encodeURIComponent(query)}`);
+    const response = await fetch(
+      `${BASE_URL}/manga/search?q=${encodeURIComponent(query)}`
+    );
     if (!response.ok) throw new Error("Search failed");
     return response.json();
   },
@@ -318,7 +411,9 @@ export const mangaApi = {
 // Search for manga
 async function searchManga(query) {
   try {
-    const response = await fetch(`http://localhost:8080/api/manga/search?q=${encodeURIComponent(query)}`);
+    const response = await fetch(
+      `http://localhost:8080/api/manga/search?q=${encodeURIComponent(query)}`
+    );
     const data = await response.json();
 
     if (response.ok) {
@@ -337,11 +432,15 @@ async function searchManga(query) {
 async function loadMangaReader(mangaId) {
   try {
     // Fetch manga details
-    const detailsResponse = await fetch(`http://localhost:8080/api/manga/${mangaId}`);
+    const detailsResponse = await fetch(
+      `http://localhost:8080/api/manga/${mangaId}`
+    );
     const mangaDetails = await detailsResponse.json();
 
     // Fetch chapters
-    const chaptersResponse = await fetch(`http://localhost:8080/api/manga/${mangaId}/chapters`);
+    const chaptersResponse = await fetch(
+      `http://localhost:8080/api/manga/${mangaId}/chapters`
+    );
     const chaptersData = await chaptersResponse.json();
 
     return {
@@ -357,7 +456,9 @@ async function loadMangaReader(mangaId) {
 // Get chapter pages
 async function loadChapterPages(chapterId) {
   try {
-    const response = await fetch(`http://localhost:8080/api/chapter/${chapterId}/pages`);
+    const response = await fetch(
+      `http://localhost:8080/api/chapter/${chapterId}/pages`
+    );
     const data = await response.json();
 
     if (response.ok) {
@@ -383,16 +484,19 @@ const api = axios.create({
 });
 
 // Search manga
-export const searchManga = (query) => api.get("/manga/search", { params: { q: query } });
+export const searchManga = (query) =>
+  api.get("/manga/search", { params: { q: query } });
 
 // Get manga details
 export const getMangaDetails = (mangaId) => api.get(`/manga/${mangaId}`);
 
 // Get manga chapters
-export const getMangaChapters = (mangaId) => api.get(`/manga/${mangaId}/chapters`);
+export const getMangaChapters = (mangaId) =>
+  api.get(`/manga/${mangaId}/chapters`);
 
 // Get chapter pages
-export const getChapterPages = (chapterId) => api.get(`/chapter/${chapterId}/pages`);
+export const getChapterPages = (chapterId) =>
+  api.get(`/chapter/${chapterId}/pages`);
 ```
 
 ---
