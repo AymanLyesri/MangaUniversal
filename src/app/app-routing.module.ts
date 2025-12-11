@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { HomeComponent } from './components/home/home.component';
 import { SearchComponent } from './components/search/search.component';
 import { MangaDetailsComponent } from './components/manga-details/manga-details.component';
 import { ReaderComponent } from './components/reader/reader.component';
@@ -9,8 +10,13 @@ import { chaptersResolver } from './resolvers/chapters.resolver';
 const routes: Routes = [
   {
     path: '',
+    component: HomeComponent,
+    title: 'MangaUniversal - Popular Manga',
+  },
+  {
+    path: 'search',
     component: SearchComponent,
-    title: 'MangaUniversal - Search',
+    title: 'Search - MangaUniversal',
   },
   {
     path: 'manga/:id/:slug',

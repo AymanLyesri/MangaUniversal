@@ -10,6 +10,7 @@ import {
   ChaptersResponse,
   PagesResponse,
   ErrorResponse,
+  PopularMangaResponse,
 } from '../models/manga.model';
 import { environment } from '../../environments/environment';
 
@@ -77,6 +78,27 @@ export class MangaService {
         map((response) => response.pages),
         catchError(this.handleError)
       );
+  }
+
+  /**
+   * Get popular manga sorted by followers
+   * @param limit - Number of results per page (1-100)
+   * @param offset - Pagination offset (≥0)
+   * @param order - Sort order: "asc" or "desc"
+   * @param sortBy - Field to sort by (default: "followedCount")
+   * @returns Observable of popular manga response
+   */
+  getPopularManga(
+    limit: number = 20,
+    offset: number = 0,
+    order: 'asc' | 'desc' = 'desc',
+    sortBy: string = 'followedCount'
+  ): Observable<any> {
+    return this.http
+      .get<any>(
+        `${this.baseUrl}/manga/popular?limit=${limit}&offset=${offset}&order=${order}&sortBy=${sortBy}`
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**

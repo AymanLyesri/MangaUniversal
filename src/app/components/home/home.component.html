@@ -1,0 +1,89 @@
+<div class="min-h-screen bg-surface theme-transition">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Hero Section -->
+    <div class="text-center space-y-3 mb-10 animate-fade-in-up">
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-text-primary">
+        Popular Manga
+      </h1>
+      <p class="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto">
+        Discover the most followed manga
+      </p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading$ | async" class="flex flex-col items-center justify-center py-20 space-y-4 animate-fade-in">
+      <div class="spinner h-16 w-16"></div>
+      <p class="text-text-secondary animate-pulse-soft">Loading popular manga...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="(error$ | async) && !(loading$ | async)" class="max-w-md mx-auto animate-scale-in">
+      <div class="glass-card bg-red-500/10 border border-red-500/30 rounded-2xl p-6 text-center shadow-xl">
+        <svg class="w-12 h-12 mx-auto text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <p class="text-red-600 dark:text-red-400 font-medium">{{ error$ | async }}</p>
+      </div>
+    </div>
+
+    <!-- Manga Grid -->
+    <div 
+      *ngIf="!(loading$ | async) && !(error$ | async) && (popularManga$ | async)?.length"
+      class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 fade-in-stagger"
+    >
+      <a
+        *ngFor="let manga of popularManga$ | async; trackBy: trackByMangaId"
+        [routerLink]="['/manga', manga.id, generateSlug(manga.title)]"
+        class="group block bg-surface-elevated rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-[1.03] border border-border hover:border-border-hover animate-fade-in-up hover-lift"
+      >
+        <!-- Cover Image -->
+        <div class="relative aspect-[3/4] overflow-hidden bg-surface">
+          <img
+            [src]="manga.coverUrl || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22%3E%3Crect width=%22300%22 height=%22400%22 fill=%22%23333%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2220%22%3ENo Image%3C/text%3E%3C/svg%3E'"
+            [alt]="manga.title"
+            class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 group-hover:brightness-75"
+            loading="lazy"
+            crossorigin="anonymous"
+            onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22%3E%3Crect width=%22300%22 height=%22400%22 fill=%22%23333%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2220%22%3ENo Image%3C/text%3E%3C/svg%3E'"
+          />
+          
+          <!-- Glass overlay on hover -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          
+          <!-- Followers Badge -->
+          <div *ngIf="manga.followers" class="absolute top-3 right-3 z-10">
+            <span class="px-2.5 py-1.5 text-xs font-semibold rounded-lg glass bg-primary/90 text-white shadow-lg flex items-center gap-1 transition-all duration-300 group-hover:scale-110">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              {{ formatFollowers(manga.followers) }}
+            </span>
+          </div>
+
+          <!-- Hover overlay with icon -->
+          <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 z-10">
+            <div class="bg-white/20 dark:bg-black/30 backdrop-blur-md rounded-full p-4 transform scale-75 group-hover:scale-100 transition-transform duration-300">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-4 space-y-2 bg-gradient-to-b from-surface-elevated to-surface transition-colors duration-300">
+          <!-- Title -->
+          <h3 class="font-semibold text-base text-text-primary line-clamp-2 group-hover:text-primary transition-all duration-300 group-hover:translate-x-1">
+            {{ manga.title }}
+          </h3>
+
+          <!-- Description -->
+          <p *ngIf="manga.description" class="text-xs text-text-secondary line-clamp-2 leading-relaxed">
+            {{ manga.description }}
+          </p>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>

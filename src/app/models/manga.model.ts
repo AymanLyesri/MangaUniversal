@@ -49,3 +49,18 @@ export interface ErrorResponse {
   error: string;
   status: number;
 }
+
+export interface PopularMangaItem {
+  id: string;
+  title: string;
+  description: string | null;
+  followers: number | null;
+  coverUrl: string | null;
+}
+
+export interface PopularMangaResponse {
+  total: number;
+  limit: number;
+  offset: number;
+  results: PopularMangaItem[];
+}

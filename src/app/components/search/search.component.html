@@ -1,43 +1,13 @@
 <div class="min-h-screen bg-surface theme-transition">
-  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <!-- Hero Section -->
-    <div class="text-center space-y-6 mb-12 animate-fade-in-up">
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary bg-clip-text transition-all duration-500 hover:scale-105">
-        MangaUniversal
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Simple Header -->
+    <div class="text-center space-y-2 mb-8 animate-fade-in-up">
+      <h1 class="text-3xl sm:text-4xl font-bold text-text-primary">
+        Search Results
       </h1>
-      <p class="text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto leading-relaxed animate-fade-in-up" style="animation-delay: 100ms;">
-        Discover and read your favorite manga from around the world
+      <p *ngIf="searchQuery" class="text-base text-text-secondary">
+        Showing results for "<span class="text-primary font-medium">{{ searchQuery }}</span>"
       </p>
-
-      <!-- Search Input -->
-      <div class="max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 200ms;">
-        <div class="relative group">
-          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-            <svg class="h-6 w-6 text-text-tertiary group-focus-within:text-primary transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <input
-            type="text"
-            [(ngModel)]="searchQuery"
-            (ngModelChange)="onSearchChange($event)"
-            placeholder="Search manga by title..."
-            class="w-full pl-14 pr-14 py-5 text-lg glass bg-surface-elevated/80 border border-border rounded-2xl text-text-primary placeholder-text-tertiary shadow-lg hover:shadow-xl focus:shadow-2xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent hover:border-border-hover"
-          />
-          <button
-            *ngIf="searchQuery"
-            (click)="clearSearch()"
-            class="absolute inset-y-0 right-0 pr-4 flex items-center text-text-tertiary hover:text-text-primary transition-all duration-300 hover:scale-110 z-10"
-          >
-            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-          
-          <!-- Decorative gradient on focus -->
-          <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-        </div>
-      </div>
     </div>
 
     <!-- Loading State -->
@@ -59,16 +29,11 @@
     <!-- Results Grid -->
     <div 
       *ngIf="!(loading$ | async) && !(error$ | async) && (searchResults$ | async)?.length as resultCount"
-      class="space-y-8"
+      class="space-y-6"
     >
-      <div class="glass-card p-4 rounded-2xl inline-block mx-auto animate-fade-in">
-        <p class="text-text-secondary font-medium flex items-center gap-2">
-          <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          Found <span class="text-primary font-bold">{{ resultCount }}</span> result{{ resultCount !== 1 ? 's' : '' }}
-        </p>
-      </div>
+      <p class="text-center text-text-secondary text-sm">
+        Found <span class="text-primary font-semibold">{{ resultCount }}</span> result{{ resultCount !== 1 ? 's' : '' }}
+      </p>
       
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 fade-in-stagger">
         <app-manga-card
@@ -80,41 +45,15 @@
 
     <!-- No Results -->
     <div 
-      *ngIf="!(loading$ | async) && (hasSearched$ | async) && (searchResults$ | async)?.length === 0 && !(error$ | async)"
-      class="text-center py-20 space-y-6 animate-fade-in-up"
+      *ngIf="!(loading$ | async) && searchQuery && (searchResults$ | async)?.length === 0 && !(error$ | async)"
+      class="text-center py-20 space-y-4 animate-fade-in-up"
     >
-      <div class="relative inline-block">
-        <svg class="w-24 h-24 mx-auto text-text-tertiary animate-float" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <div class="absolute inset-0 bg-primary/10 blur-2xl rounded-full"></div>
-      </div>
-      <div class="space-y-2">
-        <p class="text-2xl font-semibold text-text-primary">No manga found</p>
-        <p class="text-text-tertiary">Try searching with a different title</p>
-      </div>
-      <button 
-        (click)="clearSearch()"
-        class="btn-primary mx-auto"
-      >
-        Clear Search
-      </button>
-    </div>
-
-    <!-- Empty State (No Search) -->
-    <div 
-      *ngIf="!(hasSearched$ | async) && !(loading$ | async)"
-      class="text-center py-20 space-y-6 animate-fade-in-up"
-    >
-      <div class="relative inline-block">
-        <svg class="w-24 h-24 mx-auto text-text-tertiary animate-float" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-        <div class="absolute inset-0 bg-primary/10 blur-3xl rounded-full"></div>
-      </div>
-      <div class="space-y-3">
-        <p class="text-2xl font-semibold text-text-primary">Start searching for manga</p>
-        <p class="text-text-secondary max-w-md mx-auto">Enter a manga title in the search box above to discover thousands of manga from around the world</p>
+      <svg class="w-16 h-16 mx-auto text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div class="space-y-1">
+        <p class="text-xl font-semibold text-text-primary">No manga found</p>
+        <p class="text-text-tertiary text-sm">Try searching with a different title</p>
       </div>
     </div>
   </div>

@@ -1,39 +1,48 @@
-import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { MangaService } from '../../services/manga.service';
 import { MangaSearchResult } from '../../models/manga.model';
 import { MangaCardComponent } from '../manga-card/manga-card.component';
 import { Subject, BehaviorSubject } from 'rxjs';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  switchMap,
-  catchError,
-  takeUntil,
-} from 'rxjs/operators';
-import { of } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, FormsModule, MangaCardComponent],
+  imports: [CommonModule, MangaCardComponent],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SearchComponent implements OnDestroy {
+export class SearchComponent implements OnInit, OnDestroy {
   searchQuery = '';
   searchResults$ = new BehaviorSubject<MangaSearchResult[]>([]);
   loading$ = new BehaviorSubject<boolean>(false);
   error$ = new BehaviorSubject<string | null>(null);
-  hasSearched$ = new BehaviorSubject<boolean>(false);
 
-  private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
-  constructor(private mangaService: MangaService) {
-    this.setupSearch();
+  constructor(
+    private mangaService: MangaService,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit(): void {
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        const query = params['q'];
+        if (query) {
+          this.searchQuery = query;
+          this.performSearch(query);
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -41,44 +50,24 @@ export class SearchComponent implements OnDestroy {
     this.destroy$.complete();
   }
 
-  private setupSearch(): void {
-    this.searchSubject
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged(),
-        switchMap((query) => {
-          if (!query || query.trim().length === 0) {
-            this.hasSearched$.next(false);
-            return of([]);
-          }
+  private performSearch(query: string): void {
+    if (!query || query.trim().length === 0) {
+      return;
+    }
 
-          this.loading$.next(true);
-          this.error$.next(null);
-          this.hasSearched$.next(true);
+    this.loading$.next(true);
+    this.error$.next(null);
 
-          return this.mangaService.searchManga(query).pipe(
-            catchError((error) => {
-              this.error$.next(error.message || 'Failed to search manga');
-              return of([]);
-            })
-          );
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((results) => {
+    this.mangaService.searchManga(query).subscribe({
+      next: (results) => {
         this.searchResults$.next(results);
         this.loading$.next(false);
-      });
-  }
-
-  onSearchChange(query: string): void {
-    this.searchQuery = query;
-    this.searchSubject.next(query);
-  }
-
-  clearSearch(): void {
-    this.searchQuery = '';
-    this.searchSubject.next('');
+      },
+      error: (error) => {
+        this.error$.next(error.message || 'Failed to search manga');
+        this.loading$.next(false);
+      },
+    });
   }
 
   trackByMangaId(index: number, manga: MangaSearchResult): string {
