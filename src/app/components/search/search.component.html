@@ -1,0 +1,93 @@
+<div class="min-h-screen bg-surface">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Hero Section -->
+    <div class="text-center space-y-6 mb-12">
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary">
+        MangaUniversal
+      </h1>
+      <p class="text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto">
+        Discover and read your favorite manga from around the world
+      </p>
+
+      <!-- Search Input -->
+      <div class="max-w-2xl mx-auto">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange($event)"
+            placeholder="Search manga by title..."
+            class="w-full pl-12 pr-12 py-4 text-lg bg-surface-elevated border border-border rounded-xl text-text-primary placeholder-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+          />
+          <button
+            *ngIf="searchQuery"
+            (click)="clearSearch()"
+            class="absolute inset-y-0 right-0 pr-4 flex items-center text-text-tertiary hover:text-text-primary transition-colors duration-200"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading$ | async" class="flex justify-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="(error$ | async) && !(loading$ | async)" class="max-w-md mx-auto">
+      <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-center">
+        <p class="text-red-600 dark:text-red-400">{{ error$ | async }}</p>
+      </div>
+    </div>
+
+    <!-- Results Grid -->
+    <div 
+      *ngIf="!(loading$ | async) && !(error$ | async) && (searchResults$ | async)?.length as resultCount"
+      class="space-y-6"
+    >
+      <p class="text-text-secondary text-center">
+        Found {{ resultCount }} result{{ resultCount !== 1 ? 's' : '' }}
+      </p>
+      
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6">
+        <app-manga-card
+          *ngFor="let manga of searchResults$ | async; trackBy: trackByMangaId"
+          [manga]="manga"
+        ></app-manga-card>
+      </div>
+    </div>
+
+    <!-- No Results -->
+    <div 
+      *ngIf="!(loading$ | async) && (hasSearched$ | async) && (searchResults$ | async)?.length === 0 && !(error$ | async)"
+      class="text-center py-12 space-y-4"
+    >
+      <svg class="w-20 h-20 mx-auto text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <p class="text-xl text-text-secondary">No manga found</p>
+      <p class="text-text-tertiary">Try searching with a different title</p>
+    </div>
+
+    <!-- Empty State (No Search) -->
+    <div 
+      *ngIf="!(hasSearched$ | async) && !(loading$ | async)"
+      class="text-center py-12 space-y-4"
+    >
+      <svg class="w-20 h-20 mx-auto text-text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+      <p class="text-xl text-text-secondary">Start searching for manga</p>
+      <p class="text-text-tertiary">Enter a manga title in the search box above</p>
+    </div>
+  </div>
+</div>

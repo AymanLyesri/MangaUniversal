@@ -1,0 +1,113 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Custom Properties for Theme Colors */
+:root {
+  /* Light theme colors */
+  --color-surface: 255 255 255;
+  --color-surface-elevated: 249 250 251;
+  --color-surface-hover: 243 244 246;
+  --color-primary: 59 130 246;
+  --color-primary-hover: 37 99 235;
+  --color-text-primary: 17 24 39;
+  --color-text-secondary: 75 85 99;
+  --color-text-tertiary: 156 163 175;
+  --color-border: 229 231 235;
+  --color-border-hover: 209 213 219;
+}
+
+.dark {
+  /* Dark theme colors */
+  --color-surface: 15 15 15;
+  --color-surface-elevated: 23 23 23;
+  --color-surface-hover: 38 38 38;
+  --color-primary: 96 165 250;
+  --color-primary-hover: 147 197 253;
+  --color-text-primary: 243 244 246;
+  --color-text-secondary: 156 163 175;
+  --color-text-tertiary: 107 114 128;
+  --color-border: 38 38 38;
+  --color-border-hover: 64 64 64;
+}
+
+/* Base styles */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-surface text-text-primary antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+  }
+
+  /* Remove default number input spinners globally */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+}
+
+/* Utility classes */
+@layer utilities {
+  .container {
+    @apply max-w-8xl;
+  }
+
+  /* Line clamp utilities for text truncation */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-surface;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border hover:bg-border-hover rounded;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}

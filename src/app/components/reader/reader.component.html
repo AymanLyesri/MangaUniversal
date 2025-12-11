@@ -1,0 +1,152 @@
+<div class="fixed inset-0 bg-black">
+  <!-- Loading State -->
+  <div *ngIf="loading$ | async" class="flex justify-center items-center h-full">
+    <div class="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="(error$ | async) && !(loading$ | async)" class="flex justify-center items-center h-full">
+    <div class="text-center space-y-4 p-8">
+      <p class="text-red-400 text-lg">{{ error$ | async }}</p>
+      <button
+        (click)="exitReader()"
+        class="px-6 py-3 bg-white text-black rounded-lg hover:bg-gray-200 transition-colors duration-200"
+      >
+        Go Back
+      </button>
+    </div>
+  </div>
+
+  <!-- Reader Content -->
+  <div *ngIf="!(loading$ | async) && !(error$ | async)" class="h-full flex flex-col">
+    <!-- Top Controls -->
+    <div 
+      class="absolute top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 to-transparent transition-all duration-300"
+      [class.opacity-0]="!(showControls$ | async)"
+      [class.pointer-events-none]="!(showControls$ | async)"
+    >
+      <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+        <!-- Exit Button -->
+        <button
+          (click)="exitReader()"
+          class="flex items-center gap-2 text-white hover:text-gray-300 transition-colors duration-200"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          <span class="hidden sm:inline">Exit</span>
+        </button>
+
+        <!-- Chapter Info -->
+        <div class="text-white text-center">
+          <p class="text-sm sm:text-base font-medium">
+            Reading
+          </p>
+        </div>
+
+        <!-- Page Counter -->
+        <div class="text-white text-sm sm:text-base">
+          {{ currentPage }} / {{ totalPages }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Image Container -->
+    <div class="flex-1 flex items-center justify-center overflow-hidden">
+      <img
+        [src]="currentPageUrl"
+        [alt]="'Page ' + currentPage"
+        class="max-w-full max-h-full w-auto h-auto object-contain"
+        crossorigin="anonymous"
+        (load)="loading$.next(false)"
+        (error)="error$.next('Failed to load page')"
+      />
+    </div>
+
+    <!-- Navigation Zones (Click areas) -->
+    <div class="absolute inset-0 flex pointer-events-none">
+      <!-- Previous Page (Left third) -->
+      <button
+        *ngIf="hasPreviousPage"
+        (click)="previousPage()"
+        class="flex-1 pointer-events-auto cursor-w-resize hover:bg-white/5 transition-colors duration-200 group"
+        aria-label="Previous page"
+      >
+        <div class="h-full flex items-center justify-start pl-8 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </div>
+      </button>
+
+      <!-- Middle (Show controls) -->
+      <div class="flex-1"></div>
+
+      <!-- Next Page (Right third) -->
+      <button
+        *ngIf="hasNextPage"
+        (click)="nextPage()"
+        class="flex-1 pointer-events-auto cursor-e-resize hover:bg-white/5 transition-colors duration-200 group"
+        aria-label="Next page"
+      >
+        <div class="h-full flex items-center justify-end pr-8 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </button>
+    </div>
+
+    <!-- Bottom Controls -->
+    <div 
+      class="absolute bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-black/80 to-transparent transition-all duration-300"
+      [class.opacity-0]="!(showControls$ | async)"
+      [class.pointer-events-none]="!(showControls$ | async)"
+    >
+      <div class="container mx-auto px-4 py-6">
+        <!-- Navigation Buttons -->
+        <div class="flex items-center justify-center gap-4">
+          <button
+            (click)="previousPage()"
+            [disabled]="!hasPreviousPage"
+            class="p-3 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 text-white"
+            aria-label="Previous page"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          <!-- Page Input -->
+          <div class="flex items-center gap-2 text-white">
+            <input
+              type="number"
+              [value]="currentPage"
+              (change)="goToPage(+$any($event.target).value)"
+              min="1"
+              [max]="totalPages"
+              class="w-16 px-2 py-1 text-center bg-white/10 border border-white/20 rounded text-white focus:outline-none focus:ring-2 focus:ring-white/40"
+            />
+            <span>/ {{ totalPages }}</span>
+          </div>
+
+          <button
+            (click)="nextPage()"
+            [disabled]="!hasNextPage"
+            class="p-3 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 text-white"
+            aria-label="Next page"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Keyboard Hints -->
+        <div class="mt-4 text-center text-xs text-white/60">
+          Use arrow keys to navigate • Press ESC to exit
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

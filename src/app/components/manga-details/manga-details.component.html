@@ -1,0 +1,124 @@
+<div class="min-h-screen bg-surface">
+  <!-- Loading State -->
+  <div *ngIf="loading$ | async" class="flex justify-center items-center min-h-screen">
+    <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="(error$ | async) && !(loading$ | async)" class="container mx-auto px-4 py-12">
+    <div class="max-w-md mx-auto bg-red-500/10 border border-red-500/30 rounded-lg p-6 text-center">
+      <p class="text-red-600 dark:text-red-400 text-lg">{{ error$ | async }}</p>
+      <a routerLink="/" class="inline-block mt-4 text-primary hover:underline">
+        Go back to search
+      </a>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="(manga$ | async) as manga" class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Back Button -->
+    <button
+      routerLink="/"
+      class="inline-flex items-center gap-2 text-text-secondary hover:text-primary transition-colors duration-200 mb-6"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      Back to search
+    </button>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Left Column - Cover and Info -->
+      <div class="lg:col-span-1">
+        <div class="sticky top-20 space-y-6">
+          <!-- Cover Image -->
+          <div class="aspect-[3/4] rounded-xl overflow-hidden shadow-lg bg-surface-elevated">
+            <img
+              [src]="coverImageSrc(manga.cover)"
+              [alt]="manga.title"
+              class="w-full h-full object-cover"
+              crossorigin="anonymous"
+              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22400%22%3E%3Crect width=%22300%22 height=%22400%22 fill=%22%23333%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2220%22%3ENo Image%3C/text%3E%3C/svg%3E'"
+            />
+          </div>
+
+          <!-- Quick Info Card -->
+          <div class="bg-surface-elevated rounded-xl p-6 space-y-4 border border-border">
+            <!-- Status -->
+            <div class="flex items-center justify-between">
+              <span class="text-text-secondary">Status</span>
+              <span 
+                class="px-3 py-1 text-sm font-medium rounded-full text-white capitalize"
+                [ngClass]="getStatusColor(manga.status)"
+              >
+                {{ manga.status }}
+              </span>
+            </div>
+
+            <!-- Year -->
+            <div class="flex items-center justify-between">
+              <span class="text-text-secondary">Year</span>
+              <span class="text-text-primary font-medium">{{ manga.year }}</span>
+            </div>
+
+            <!-- Authors -->
+            <div *ngIf="manga.authors && manga.authors.length > 0" class="space-y-2">
+              <span class="text-text-secondary">Authors</span>
+              <div class="flex flex-wrap gap-2">
+                <span *ngFor="let author of manga.authors" class="text-text-primary text-sm">
+                  {{ author }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Artists -->
+            <div *ngIf="manga.artists && manga.artists.length > 0" class="space-y-2">
+              <span class="text-text-secondary">Artists</span>
+              <div class="flex flex-wrap gap-2">
+                <span *ngFor="let artist of manga.artists" class="text-text-primary text-sm">
+                  {{ artist }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Details and Chapters -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Title and Description -->
+        <div class="space-y-4">
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-text-primary">
+            {{ manga.title }}
+          </h1>
+
+          <div class="prose prose-neutral dark:prose-invert max-w-none">
+            <p class="text-text-secondary leading-relaxed">
+              {{ manga.description }}
+            </p>
+          </div>
+
+          <!-- Tags -->
+          <div *ngIf="manga.tags && manga.tags.length > 0" class="flex flex-wrap gap-2">
+            <span
+              *ngFor="let tag of manga.tags"
+              class="px-3 py-1 text-sm bg-primary/10 text-primary rounded-full border border-primary/20"
+            >
+              {{ tag }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <hr class="border-border" />
+
+        <!-- Chapter List -->
+        <app-chapter-list
+          [chapters]="(chapters$ | async) || []"
+          [mangaId]="manga.id"
+          [mangaSlug]="mangaSlug"
+        ></app-chapter-list>
+      </div>
+    </div>
+  </div>
+</div>
